@@ -1,0 +1,3 @@
+% site	lat	lon
+boulder	40	-105.265
+wichita	37	-97
