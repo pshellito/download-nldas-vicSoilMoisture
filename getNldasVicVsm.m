@@ -1,6 +1,6 @@
-function [ outDir ] = getNldasVsm(qNames, qLat, qLon, qStart, qEnd, outDir)
+function [ outDir ] = getNldasVicVsm(qNames, qLat, qLon, qStart, qEnd, outDir)
 
-% GETNLDASFORCING This script will download NLDAS primary forcing data from
+% GETNLDASFORCING This script will download NLDAS vic data from
 %       Nasa's servers.
 % Created by Peter J. Shellito 2/16/16
 % 
@@ -23,7 +23,7 @@ function [ outDir ] = getNldasVsm(qNames, qLat, qLon, qStart, qEnd, outDir)
 % you can find all the NLDAS data:
 % http://disc.sci.gsfc.nasa.gov/hydrology/data-holdings
 % And the location of a sample file:
-% fileDir = 'ftp://hydro1.sci.gsfc.nasa.gov/data/s4pa/NLDAS/NLDAS_NOAH0125_H.002/2016/001/NLDAS_NOAH0125_H.A20160101.0000.002.grb';
+% fileDir = 'ftp://hydro1.sci.gsfc.nasa.gov/data/s4pa/NLDAS/NLDAS_VIC0125_H.002/2016/001/NLDAS_VIC0125_H.A20160101.0000.002.grb';
 % 
 % Initial testing revealed that processing one month took 20 minutes using
 % a CU internet connection.
@@ -161,7 +161,7 @@ qDoyStr = num2str(qDoy', '%03d');
 % Create hour strings
 qHourStr = num2str((0:100:2300)','%04d');
 % The directory where nldas forcings are held
-ftpBaseDir = '/data/s4pa/NLDAS/NLDAS_NOAH0125_H.002/';
+ftpBaseDir = '/data/s4pa/NLDAS/NLDAS_VIC0125_H.002/';
 % The local directory where nldas forcings will be placed
 localBaseDir = [pwd '/data'];
 % If there is already a directory named data in the working directory, do not continue because
@@ -173,7 +173,7 @@ if exist(localBaseDir, 'dir') == 7
         'because the end of this function will DELETE ./data and all files within it.')
 end
 % The beginning of the file name of forcings
-ftpBaseFn = 'NLDAS_NOAH0125_H.A';
+ftpBaseFn = 'NLDAS_VIC0125_H.A';
 % The end of the file name of forcings
 ftpEndFn = '.002.grb';
 
@@ -185,11 +185,11 @@ lonStr = 'lon'; % 464x1. Center of 1/8 degree pixel
 rainStr = 'Liquid_precipitation_rainfall_surface_1_Hour_Average'; % 1x224x464. Rainfall. kg/m2 accumulated.
 snowStr = 'Frozen_precipitation_eg_snowfall_surface_1_Hour_Average'; % 1x224x464. Snowfall. kg/m2 accumulated.
 % These are 3-d matrices
- liqSoilMStr = 'Liquid_soil_moisture_content_non-frozen_layer_between_two_depths_below_surface_layer'; % a 1 by 4 by 224 by 464 matrix. Nonfrozen moisture. Depths are: 0 to 10, 10 to 40, 40 to 100, 100 to 200 cm layer depths. (kg/m2) Instantaneous.
-totSoilMStr = 'Soil_moisture_content_layer_between_two_depths_below_surface_layer'; % a 1 by 6 by 224 by 464 matrix. Depths are 0 to 10, 10 to 40, 0 to 100, 40 to 100, 0 to 200, 100 to 200. (kg/m2) Instantaneous.
+liqSoilMStr = 'Liquid_soil_moisture_content_non-frozen_hybrid'; % a 1 by 3 by 224 by 464 matrix. Nonfrozen moisture, layers 1, 2, and 3. Depths are unknown as of yet... but at least one paper said layer one is "usually 10 cm" (kg/m2) Instantaneous.
+totSoilMStr = 'Soil_moisture_content_hybrid'; % a 1 by 4 by 224 by 464 matrix. Layers 1, 2, 3, and total column. Depths are unknown as of yet... (kg/m2) Instantaneous.
 
 % Put all the strings into one cell
- allStrings = {rainStr; snowStr; liqSoilMStr; totSoilMStr};
+allStrings = {rainStr; snowStr; liqSoilMStr; totSoilMStr};
 % Names and units for the variables (for headers). LSM = Liquid soil
 % moisture content. TSM = Total soil moisture. Numbers refer to cm below
 % surface. E.g., LSM_10_40 is the liquid (nonfrozen) soil moisture content

@@ -8,7 +8,7 @@ close all
 % -------------------------------------------------------------------------
 % In this example, there are sites with latitude and longitude in the
 % following input file:
-inFile = './inFile.txt';
+inFile = './inFile_test.txt';
 % Date range requested
 qStart = [2015,3,31];
 % qStart = 'apnd';
@@ -42,7 +42,7 @@ startTime = datetime;
 
 % -------------------------------------------------------------------------
 % Call the function
-outDirectory = getNldasVsm(qNames, qLat, qLon, qStart, qEnd, outDir);
+outDirectory = getNldasVicVsm(qNames, qLat, qLon, qStart, qEnd, outDir);
 
 % -------------------------------------------------------------------------
 % Report where the data are held and how long the script took to run
