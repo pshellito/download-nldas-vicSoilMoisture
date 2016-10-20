@@ -127,6 +127,12 @@ end
 if dnEnd < dnStart
     error('Start date cannot be after end date')
 end
+% If longitude is over 180, express as a negative
+for qq = 1:length(qLon)
+    if qLon(qq)>180
+        qLon(qq) = qLon(qq)-360;
+    end
+end
 % -------------------------------------------------------------------------
 % Set up some variables
 % Number of sites requested
@@ -194,10 +200,10 @@ allStrings = {rainStr; snowStr; liqSoilMStr; totSoilMStr};
 % moisture content. TSM = Total soil moisture. Numbers refer to cm below
 % surface. E.g., LSM_10_40 is the liquid (nonfrozen) soil moisture content
 % between 10 and 40 cm.
-namesStrAll = 'Rain      Snow      LSM_0_10 LSM_10_40 LSM_40_100 LSM_100_200 TSM_0_10 TSM_10_40 TSM_40_100 TSM_100_200';
-unitsStrAll = '[kg/m2]   [kg/m2]   [kg/m2]  [kg/m2]   [kg/m2]    [kg/m2]     [kg/m2]  [kg/m2]   [kg/m2]    [kg/m2]';
+namesStrAll = 'Rain      Snow      LSM_1    LSM_2     LSM_3      TSM_1       TSM_2    TSM_3     TSM_column';
+unitsStrAll = '[kg/m2]   [kg/m2]   [kg/m2]  [kg/m2]   [kg/m2]    [kg/m2]     [kg/m2]  [kg/m2]   [kg/m2]';
 % Variable formats
-varFmt = '%5.3e %5.3e %5.2f %8.2f %10.2f %10.2f %10.2f %9.2f %9.2f %10.2f\n';
+varFmt = '%5.3e %5.3e %5.2f %8.2f %10.2f %10.2f %10.2f %9.2f %9.2f\n';
 % Date formats
 dateFmt = '%04d   %02d    %02d  %02d   %02d     ';
 % -------------------------------------------------------------------------
@@ -257,7 +263,7 @@ for ss = 1:nSites
         fprintf(fid(ss),['%% Site: ' qNames{ss} '\n']);
         fprintf(fid(ss),['%% Site lat/lon: ' num2str([qLat(ss) qLon(ss)]) '\n']);
         fprintf(fid(ss),['%% Closest NLDAS pixel (1/8 degree) center: ' num2str([nearestLat nearestLon]) '\n']);
-        fprintf(fid(ss),['%% File created on ' date '.\n']);
+        fprintf(fid(ss),['%% File created on ' date '. Data from VIC model.\n']);
         fprintf(fid(ss),['%% Date (UTC)                 ' namesStrAll '\n']);
         fprintf(fid(ss),['%% year month day hour minute ' unitsStrAll '\n']);
     else 
@@ -273,7 +279,7 @@ for dd = 1:length(qDatenums)
     % Location of this day's data on the local machine
     localDir = [pwd ftpBaseDir qYearStr(dd,:) '/' qDoyStr(dd,:)];
     % Loop through each hour of the day
-    for hh = 1:24
+    for hh = 1%%%:24
         % Create strings and such to define where the files are located on the host
         qFileName = [ftpBaseDir qYearStr(dd,:) '/' qDoyStr(dd,:) '/' ftpBaseFn qYearStr(dd,:) qMonthStr(dd,:) qDayStr(dd,:) '.' qHourStr(hh,:) ftpEndFn];
         % Get the file from Nasa's server
@@ -282,18 +288,15 @@ for dd = 1:length(qDatenums)
         % Create ncgeodataset object
         geo = ncdataset(localFileName{1});
         % Initialize a vector to hold the timestep's data (all variables) for entire domain
-        domainData = nan(nLat, nLon, 10);
+        domainData = nan(nLat, nLon, 9);
         % Get the data for each variable
         domainData(:,:,1) = squeeze(geo.data(allStrings{1})); % Rain
         domainData(:,:,2) = squeeze(geo.data(allStrings{2})); % Snow
         liqMoisture = squeeze(geo.data(allStrings{3})); % Liquid soil moisture
-        domainData(:,:,3:6) = permute(liqMoisture, [2 3 1]); % Originally the 4 layers were dimension 1. I want them to be dimension 3.
+        domainData(:,:,3:5) = permute(liqMoisture, [2 3 1]); % Originally the 4 layers were dimension 1. I want them to be dimension 3.
         clear liqMoisture
         totMoisture = squeeze(geo.data(allStrings{4})); % Total soil moisture
-        domainData(:,:,7) = totMoisture(1,:,:); 
-        domainData(:,:,8) = totMoisture(2,:,:);
-        domainData(:,:,9) = totMoisture(4,:,:);
-        domainData(:,:,10) = totMoisture(6,:,:); % Omitting 3 and 5 because those are 0-100 and 0-200 cm soil moisture, respectively. Such values can be obtained from adding up the layers provided here.
+        domainData(:,:,6:9) = permute(totMoisture, [2 3 1]); % Originally the 3 layers were dimension 1. I want them to be dimension 3.
         clear totMoisture
         % Loop through each site 
         for ss = 1:nSites
