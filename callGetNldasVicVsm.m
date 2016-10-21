@@ -11,7 +11,7 @@ close all
 inFile = './inFile_pbo.txt';
 % Date range requested
 qStart = [2015,3,31];
-qStart = 'apnd';
+% qStart = 'apnd';
 qEnd = [2015,4,1];
 
 % -------------------------------------------------------------------------
