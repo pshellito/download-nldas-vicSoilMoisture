@@ -279,7 +279,7 @@ for dd = 1:length(qDatenums)
     % Location of this day's data on the local machine
     localDir = [pwd ftpBaseDir qYearStr(dd,:) '/' qDoyStr(dd,:)];
     % Loop through each hour of the day
-    for hh = 1%%%:24
+    for hh = 1:24
         % Create strings and such to define where the files are located on the host
         qFileName = [ftpBaseDir qYearStr(dd,:) '/' qDoyStr(dd,:) '/' ftpBaseFn qYearStr(dd,:) qMonthStr(dd,:) qDayStr(dd,:) '.' qHourStr(hh,:) ftpEndFn];
         % Get the file from Nasa's server
